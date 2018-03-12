@@ -4,7 +4,7 @@ from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import DataRequired
 
 
-class NameForm:
+class NameForm(FlaskForm):
     name = StringField('please input your name', validators=[DataRequired()])
-    password = PasswordField('please input your password', validators=[DataRequired()])
     submit = SubmitField('Submit')
+#password = PasswordField('please input your password', validators=[DataRequired()])
