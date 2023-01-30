@@ -1,1 +1,1 @@
-select * from t_blog_seq
+SELECT * FROM CALENDAR_EVENT
