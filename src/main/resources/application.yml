@@ -4,7 +4,7 @@ server:
     context-path: /calendar
 spring:
   profiles:
-    active: dev
+    default: dev
   jpa:
     defer-datasource-initialization: true
     hibernate:
