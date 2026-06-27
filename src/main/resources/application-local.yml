@@ -1,0 +1,55 @@
+# ============================================================
+# violin-calendar local profile — 本机白盒调试
+# ============================================================
+# 启动（PowerShell）：
+#   $env:DB_PASSWORD = "postgres"
+#   $env:VIOLIN_JWT_SECRET = "violin-calendar-local-secret-32bytes-aaa!"
+#   mvn -f E:\Project\violin-calendar spring-boot:run "-Dspring-boot.run.profiles=local"
+#
+# 设计：
+#   - DB：复用 dev 的本地 PG，独立 schema = calendar_local
+#   - Flyway：关闭，避免跟 dev 同事迁移冲突
+#   - Snowflake ID：本机固定 200（避开 dev 100）
+#   - SQL 日志：开，便于排查 MyBatis Plus 查询
+# ============================================================
+
+server:
+  auth:
+    redirect-ip: http://localhost:3000/
+
+spring:
+  application:
+    name: violin-calendar-local
+  datasource:
+    # 业务表走自己的 schema (calendar_local)；core 表在 public
+    # PG search_path 自动在 calendar_local 找不到时 fallback 到 public
+    url: jdbc:postgresql://192.168.3.49:${DB_PORT:5432}/${DB_NAME:violin_local}?currentSchema=calendar_local
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: ${DB_PASSWORD:postgres}
+  flyway:
+    # local：只跑 calendar 自己的 V100+ business migration
+    # 不跑 violin-core 的 V1（core 表由 auth 服务启动时建到 public）
+    enabled: true
+    locations: classpath:db/migration-calendar
+    schemas: calendar_local
+    default-schema: calendar_local
+    create-schemas: true
+    baseline-on-migrate: true
+
+# ============== violin 框架配置 ==============
+violin:
+  jwt:
+    secret: ${VIOLIN_JWT_SECRET:violin-calendar-local-secret-32bytes-aaa!}
+    expiration-ms: 86400000
+  cors:
+    allowed-origins: "http://localhost:5173,http://localhost:8085,http://127.0.0.1:5173"
+  snowflake:
+    worker-id: ${VIOLIN_SNOWFLAKE_WORKER_ID:200}
+
+logging:
+  config: classpath:logback-spring-dev.xml
+  level:
+    cn.violin: DEBUG
+    cn.violin.calendar: TRACE
+    com.baomidou.mybatisplus: DEBUG

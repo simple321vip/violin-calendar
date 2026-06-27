@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: violin-calendar-config
+  namespace: violin-dev
+  labels:
+    app.kubernetes.io/name: violin-calendar
+    app.kubernetes.io/component: config
+    environment: dev
+data:
+  SPRING_PROFILES_ACTIVE: "dev"
+
+  DB_HOST: "violin-postgres-dev"
+  DB_PORT: "5432"
+  DB_NAME: "violin_dev"
+  DB_USER: "postgres"
+
+  REDIS_HOST: "redis-dev"
+  REDIS_PORT: "6379"
+
+  VIOLIN_SNOWFLAKE_WORKER_ID: "1"

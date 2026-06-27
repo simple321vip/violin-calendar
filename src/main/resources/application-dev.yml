@@ -1,0 +1,45 @@
+# ============================================================
+# violin-calendar dev profile — K8s 测试环境（黑盒）
+# ============================================================
+# 部署：K8s namespace=violin-dev
+# 用途：QA 联调 / 接口测试 / 性能压测 / 前端联调
+# 数据：ConfigMap（非敏感）+ Secret（敏感）
+# ============================================================
+
+server:
+  auth:
+    redirect-ip: https://dev.violin-home.cn/
+
+spring:
+  application:
+    name: violin-calendar-dev
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:violin-postgres-dev}:${DB_PORT:5432}/${DB_NAME:violin_dev}?currentSchema=calendar_dev
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD}
+  flyway:
+    enabled: true
+    # 只跑 calendar 自己的 V100+ business migration，不跑 violin-core 的 V1
+    locations: classpath:db/migration-calendar
+    schemas: calendar_dev
+    default-schema: calendar_dev
+    create-schemas: true
+    baseline-on-migrate: true
+    clean-disabled: true
+
+# ============== violin 框架配置 ==============
+violin:
+  jwt:
+    secret: ${VIOLIN_JWT_SECRET}
+    expiration-ms: 86400000
+  cors:
+    allowed-origins: "https://dev.violin-home.cn,https://*.violin-work.online,http://localhost:5173"
+  snowflake:
+    worker-id: ${VIOLIN_SNOWFLAKE_WORKER_ID:1}
+
+logging:
+  config: classpath:logback-spring-prod.xml
+  level:
+    cn.violin: INFO
+    cn.violin.calendar: INFO

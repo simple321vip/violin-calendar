@@ -1,0 +1,40 @@
+# ============================================================
+# violin-calendar prod profile — K8s 生产环境
+# ============================================================
+# 部署：K8s namespace=violin-prod
+# 数据：ConfigMap（非敏感）+ Secret（敏感）
+# ============================================================
+
+server:
+  auth:
+    redirect-ip: https://www.violin-home.cn/
+
+spring:
+  application:
+    name: violin-calendar
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:violin-postgres}:${DB_PORT:5432}/${DB_NAME:violin}?currentSchema=calendar
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD}
+  flyway:
+    enabled: true
+    # 只跑 calendar 自己的 V100+ business migration，不跑 violin-core 的 V1
+    locations: classpath:db/migration-calendar
+    schemas: calendar
+    default-schema: calendar
+    create-schemas: true
+    baseline-on-migrate: true
+
+# ============== violin 框架配置 ==============
+violin:
+  jwt:
+    secret: ${VIOLIN_JWT_SECRET}
+    expiration-ms: 86400000
+  cors:
+    allowed-origins: "https://www.violin-home.cn,https://*.violin-work.online"
+  snowflake:
+    worker-id: ${VIOLIN_SNOWFLAKE_WORKER_ID:1}
+
+logging:
+  config: classpath:logback-spring-prod.xml

@@ -1,34 +1,24 @@
 package cn.violin.calendar.service;
 
-import cn.violin.calendar.dao.CalendarEventRepo;
-import cn.violin.calendar.entity.CalendarEvent;
-import cn.violin.calendar.io.CalendarEventIn;
-import cn.violin.common.entity.Tenant;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import cn.violin.calendar.dto.request.CalendarEventRequest;
+import cn.violin.calendar.entity.CalendarEventEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class CalendarService {
+public interface CalendarService {
+    @Transactional(readOnly = true)
+    List<CalendarEventEntity> list();
 
-    @Autowired
-    private CalendarEventRepo calendarEventRepo;
+    @Transactional(readOnly = true)
+    CalendarEventEntity getById(Long id);
 
-    public List<CalendarEvent> selectCalendarEvents(Tenant tenant) {
+    @Transactional
+    CalendarEventEntity create(CalendarEventRequest request);
 
-        return calendarEventRepo.findAllByTenantId(tenant.getTenantId());
-    }
+    @Transactional
+    CalendarEventEntity update(Long id, CalendarEventRequest request);
 
-    public void putCalendarEvent(Tenant tenant, CalendarEventIn input) {
-        CalendarEvent event = new CalendarEvent();
-        event.setEventDate(input.getDate());
-        event.setEventInfo(input.getEventInfo());
-        event.setTitle(input.getTitle());
-        event.setTenantId(tenant.getTenantId());
-        calendarEventRepo.save(event);
-    }
-
+    @Transactional
+    void delete(Long id);
 }

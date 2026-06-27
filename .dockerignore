@@ -1,0 +1,44 @@
+# ============================================================
+# .dockerignore — 减小构建上下文
+# ============================================================
+
+# ---- 构建产物 ----
+target/
+build/
+*.jar
+*.war
+*.class
+*.hprof
+
+# ---- VCS ----
+.git/
+.gitignore
+.gitattributes
+
+# ---- IDE ----
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+.factorypath
+.springBeans
+.sts4-cache
+.apt_generated
+
+# ---- 日志 / 临时 ----
+*.log
+startup.log
+logs/
+tmp/
+
+# ---- 文档 / 示例（构建用不到）----
+example/
+
+# ---- 凭据 / 本地环境 ----
+.env
+.env.*
+application-local.yml
